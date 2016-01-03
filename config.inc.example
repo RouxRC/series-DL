@@ -1,0 +1,19 @@
+TORRENT_CLIENT="azureus"
+
+ACHIEVED_DIR="achieved"
+READY_DIR="ready"
+
+# One source per line, optionnaly completed by the results page number
+SOURCES="rartv
+rartv 2
+ettv"
+
+RES="720"
+
+# Set to true to always download S01E01 torrents
+DL_ALL_FIRST_EPS=false
+
+# One show per line
+SHOWS="Game of Thrones
+The league"
+
