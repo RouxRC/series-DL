@@ -1,8 +1,8 @@
 #!/bin/bash
 
+cd $(dirname $0)
 source config.inc
 
-cd $(dirname $0)
 mkdir -p "$ACHIEVED_DIR" "$READY_DIR"
 
 # Cleanup torrent files

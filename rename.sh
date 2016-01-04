@@ -1,8 +1,8 @@
 #!/bin/bash
 
+cd $(dirname $0)
 source config.inc
 
-cd $(dirname $0)
 cd "$READY_DIR"
 
 rename -v 's/\[[^\]*]tv\]//' *\[*tv\].*

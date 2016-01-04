@@ -1,9 +1,9 @@
 #!/bin/bash
 
+cd $(dirname $0)
 source config.inc
 ROOT_URL="https://kat.cr/usearch/"
 
-cd $(dirname $0)
 mkdir -p .tmp
 touch episodes.done
 
@@ -13,15 +13,15 @@ function uniqname {
 
 function start_client {
   if ! ps x | grep "$TORRENT_CLIENT" | grep -v " grep " > /dev/null; then
-    "$TORRENT_CLIENT" > /dev/null 2>&1 &
+    "$TORRENT_CLIENT" >> logAzu.txt 2>&1 &
     sleep 3
   fi
 }
 
 function start_torrent {
-  cd .tmp
   echo "- Starting torrent $TORRENT_ID for: $TORRENT_NAME"
   start_client
+  cd .tmp
   TORRENT_FILE=$(date +%y%m%d-%H%M)".${TORRENT_NAME}.${TORRENT_ID}.torrent"
   wget --quiet --header='Accept: text/html' --header='User-Agent: test' "$TORRENT_URL" -O "${TORRENT_FILE}.gz"
   gunzip "${TORRENT_FILE}.gz"
@@ -29,12 +29,15 @@ function start_torrent {
     echo " WARNING: torrent download failed at $TORRENT_URL"
     rm -f "${TORRENT_FILE}.gz"
   else
-    "$TORRENT_CLIENT" "$TORRENT_FILE" > /dev/null 2>&1
+    "$TORRENT_CLIENT" "$TORRENT_FILE" >> logAzu.txt 2>&1 &
     echo "$TORRENT_EP" >> ../episodes.done
   fi
   cd ..
 }
 
+echo
+echo $(date)
+echo "----------------------"
 echo "$SOURCES" | while read SOURCE; do
   QUERY=$(echo "$SOURCE" | sed -r "s| *([0-9]+)?$|%20${RES}p/\1|" | sed -r 's|(/[0-9]+)$|\1/|')
   URL="${ROOT_URL}${QUERY}?field=time_add&sorder=desc"

@@ -26,6 +26,6 @@ Edit `config.inc` and set your choices of:
 ```bash
 crontab -e
 # add a line such as:
-# */30 *   * * * <PATH TO THIS DIRECTORY>/download.sh
+# 00   *    * * *    DISPLAY=:0.0 <PATH TO THIS DIRECTORY>/download.sh >> /home/roux/dev/series-DL/logDL.txt 2>&1
 ```
 
