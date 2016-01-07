@@ -2,6 +2,12 @@
 
 Automatically handle downloading torrents for the latest episodes of your favorite shows.
 
+## Dependencies
+
+```bash
+pip install requests
+```
+
 ## Configure
 
 ```bash
