@@ -7,8 +7,12 @@ ROOT_URL="https://kat.cr/usearch/"
 mkdir -p .tmp
 touch episodes.done
 
+function lowerize {
+  echo "$1" | sed -r 's/^(.*)$/\L\1/'
+}
+
 function uniqname {
-  echo "$1" | sed -r 's/^(.*)$/\L\1/' | sed 's/[^a-z0-9]//g'
+  lowerize "$1" | sed 's/[^a-z0-9]//g'
 }
 
 function start_client {
@@ -30,7 +34,7 @@ function start_torrent {
     rm -f "${TORRENT_FILE}.gz"
   else
     "$TORRENT_CLIENT" "$TORRENT_FILE" >> logAzu.txt 2>&1 &
-    echo "$TORRENT_EP" >> ../episodes.done
+    lowerize "$TORRENT_EP" >> ../episodes.done
   fi
   cd ..
 }
@@ -55,7 +59,8 @@ echo "$SOURCES" | while read SOURCE; do
     TORRENT_NAME=$(echo "$line" | sed 's/^.*#//')
     TORRENT_EP=$(echo "$TORRENT_NAME" | sed -r "s/ ${RES}p .*$//")
     SEARCHABLE=$(uniqname "$TORRENT_NAME")
-    if grep "$TORRENT_EP" episodes.done > /dev/null; then
+    LOWERED=$(lowerize "$TORRENT_EP")
+    if grep "$LOWERED" episodes.done > /dev/null; then
       continue
     elif $DL_ALL_FIRST_EPS && echo "$TORRENT_EP" | grep -i " S01E01" > /dev/null; then
       start_torrent
