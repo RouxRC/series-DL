@@ -34,7 +34,7 @@ function start_torrent {
     rm -f "${TORRENT_FILE}.gz"
   else
     "$TORRENT_CLIENT" "$TORRENT_FILE" >> logAzu.txt 2>&1 &
-    lowerize "$TORRENT_EP" >> ../episodes.done
+    echo "$LOWERED" >> ../episodes.done
   fi
   cd ..
 }
@@ -57,7 +57,10 @@ echo "$SOURCES" | while read SOURCE; do
     TORRENT_URL=$(echo "$line" | sed 's/#.*$//')
     TORRENT_ID=$(echo "$TORRENT_URL" | sed -r 's|^.*/([0-9A-F]+)\.torrent|\1|')
     TORRENT_NAME=$(echo "$line" | sed 's/^.*#//')
-    TORRENT_EP=$(echo "$TORRENT_NAME" | sed -r "s/ ${RES}p .*$//")
+    TORRENT_EP=$(echo "$TORRENT_NAME"                   |
+     sed -r "s/ ${RES}p .*$//"                          |
+     sed -r 's/\(?[0-9]{4}\)? (S[0-9]+E[0-9]+)/\1/i'    |
+     sed -r 's/(E[0-9]+) [a-z]+ [a-z]+.*$/\1/i')
     SEARCHABLE=$(uniqname "$TORRENT_NAME")
     LOWERED=$(lowerize "$TORRENT_EP")
     if grep "$LOWERED" episodes.done > /dev/null; then
