@@ -3,15 +3,16 @@ TORRENT_CLIENT="azureus"
 ACHIEVED_DIR="achieved"
 READY_DIR="ready"
 
-# One source per line, optionnaly completed by the results page number
+# One source per line, optionnally completed by the results page number
 SOURCES="rartv
 rartv 2
 ettv"
 
 RES="720"
+SUBS_LANG="English"
 
 # Set to true to always download S01E01 torrents
-DL_ALL_FIRST_EPS=false
+DL_ALL_FIRST_EPS=true
 
 # One show per line
 SHOWS="Game of Thrones
