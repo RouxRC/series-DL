@@ -14,7 +14,7 @@ def try_get(page, ref="", headers=False, retries=3):
     if r.status_code != 200:
         if retries:
             return try_get(page, ref=ref, headers=headers, retries=retries-1)
-        return None
+        return None if not headers else None, None
     text = re_clean_lines.sub(' ', r.content.replace('&amp;', '&').replace('&nbsp;', ' '))
     if headers:
         return text, r.headers
@@ -31,7 +31,7 @@ re_eps = re.compile(r'<td class="newsDate">(\d+) Seasons?, (\d+) Episodes? *</td
 def get_all_shows():
     html = try_get("shows.php")
     if not html:
-        print >> sys.stderr, "ERROR: addic7ed.com seems unavailable", r.__dict__
+        print >> sys.stderr, "ERROR: addic7ed.com seems unavailable"
         return None
     shows = []
     for row in re_line_shows.findall(html):
@@ -122,22 +122,26 @@ def dl_sub_and_rename(path, vid, shows, lang):
                 subs.append({
                   "version": version,
                   "score": score,
-                  "suburl": sub[1] if sub[1] else sub[0]
+                  "url": sub[1] if sub[1] else sub[0]
                 })
             else:
                 others.add(".".join(version))
     if not subs:
         print >> sys.stderr, "WARNING: no good sub found for", vid, ROOT_URL+urlep, ":", " / ".join(others)
         return
-    sub = sorted(subs, key=lambda x: (x["score"], 1 if "updated" in x["suburl"] else 0),reverse=True)[0]
-    subtext, subheaders = try_get(sub["suburl"], ref=urlep, headers=True)
+    sub = sorted(subs, key=lambda x: (x["score"], 1 if "updated" in x["url"] else 0),reverse=True)[0]
+    subtext, subheaders = try_get(sub["url"], ref=urlep, headers=True)
+    if not subtext or not subheaders or 'content-disposition' not in subheaders:
+        print >> sys.stderr, "ERROR: could not download sub at %s%s for %s" % (ROOT_URL, sub["url"], vid)
+        return
     name = clean_name(subheaders['content-disposition'], lang)
     with open(os.path.join(path, "%s.srt" % name), "w") as f:
         f.write(subtext)
     os.rename(os.path.join(path, vid), os.path.join(path, "%s.%s" % (name, ext)))
 
-re_lang = re.compile(r'SUBS_LANG="?(\w+)"?')
-def lang_config():
+re_lang = re.compile(r'SUBS_LANG="?(\w+)"?[\s\r\n]+')
+re_ready = re.compile(r'READY_DIR="?(.*?)"?[\s\r\n]+')
+def get_config():
     path = os.path.dirname(os.path.abspath(__file__))
     try:
         with open(os.path.join(path, "config.inc")) as f:
@@ -145,22 +149,20 @@ def lang_config():
     except Exception as e:
         print >> sys.stderr, "ERROR: cannot open %s/config.inc file" % path
         print >> sys.stderr, type(e), e
-        return None
+        return None, None
     try:
-        return re_lang.search(conf).group(1).title()
+        return re_lang.search(conf).group(1).title(), re_ready.search(conf).group(1)
     except Exception as e:
-        print >> sys.stderr, "ERROR: SUBS_LANG is missing from %s/config.inc file" % path
+        print >> sys.stderr, "ERROR: SUBS_LANG or READY_DIR is missing from %s/config.inc file" % path
         print >> sys.stderr, type(e), e
-        print conf
-        return None
+        return None, None
 
 if __name__ == "__main__":
-    vids_dir = sys.argv[1] if len(sys.argv) > 1 else ""
+    subs_lang, vids_dir = get_config()
+    if not subs_lang:
+        exit(1)
     if not os.path.isdir(vids_dir):
         print >> sys.stderr, "ERROR: %s is not a directory" % vids_dir
-        exit(1)
-    subs_lang = lang_config()
-    if not subs_lang:
         exit(1)
     shows = get_all_shows()
     if not shows:
