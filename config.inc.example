@@ -1,10 +1,15 @@
+# Command line for your torrent client
+# should be able to start new torrents with commands such as "azureus file.torrent"
 TORRENT_CLIENT="azureus"
 
+# Where your TORRENT_CLIENT saves completed torrents
 ACHIEVED_DIR="achieved"
+# Where you want everything ready to be watched to be
 READY_DIR="ready"
 
 # Your choice of resolution (720 or 1080)
 RES="720"
+# Your choice of subtitles language
 SUBS_LANG="English"
 
 # Set to true to always download S01E01 torrents
