@@ -4,6 +4,9 @@ cd $(dirname $0)
 source config.inc
 ROOT_URL="https://kat.cr/usearch/"
 
+# TODO
+# should take a number of pages per source
+
 mkdir -p .tmp
 touch episodes.done
 
