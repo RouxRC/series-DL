@@ -3,16 +3,16 @@ TORRENT_CLIENT="azureus"
 ACHIEVED_DIR="achieved"
 READY_DIR="ready"
 
-# One source per line, optionnally completed by the results page number
-SOURCES="rartv
-rartv 2
-ettv"
-
+# Your choice of resolution (720 or 1080)
 RES="720"
 SUBS_LANG="English"
 
 # Set to true to always download S01E01 torrents
 DL_ALL_FIRST_EPS=true
+
+# One source per line, optionnally completed by the number of pages to crawl
+SOURCES="rartv 5
+ettv 5"
 
 # One show per line
 SHOWS="Game of Thrones
