@@ -16,8 +16,9 @@ function uniqname {
 }
 
 function start_client {
-  if ! ps x | grep "$TORRENT_CLIENT" | grep -v " grep " > /dev/null; then
-    "$TORRENT_CLIENT" >> logAzu.txt 2>&1 &
+  CLIENT=$(echo "$TORRENT_CLIENT" | sed 's/ .*$//')
+  if ! ps x | grep "$CLIENT" | grep -v " grep " > /dev/null; then
+    "$CLIENT" >> logTor.txt 2>&1 &
     sleep 3
   fi
 }

@@ -1,5 +1,5 @@
 # Command line for your torrent client
-# should be able to start new torrents with commands such as "azureus file.torrent"
+# should be able to start new torrents with commands such as `$TORRENT_CLIENT file.torrent`
 TORRENT_CLIENT="azureus"
 
 # Where your TORRENT_CLIENT saves completed torrents
