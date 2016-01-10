@@ -15,9 +15,9 @@ def try_get(page, ref="", headers=False, retries=3):
         if retries:
             return try_get(page, ref=ref, headers=headers, retries=retries-1)
         return None if not headers else None, None
-    text = re_clean_lines.sub(' ', r.content.replace('&amp;', '&').replace('&nbsp;', ' '))
     if headers:
-        return text, r.headers
+        return r.content, r.headers
+    text = re_clean_lines.sub(' ', r.content.replace('&amp;', '&').replace('&nbsp;', ' '))
     return text
 
 def err(typ, season, name, urlseason, episode=None):
