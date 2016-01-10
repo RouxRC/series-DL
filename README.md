@@ -1,6 +1,8 @@
 # series-DL
 
-Automatically handle downloading from KickAssTorrents the latest episodes of your list of favorite shows, get matching subs on Addic7ed and rename all files cleanly in your ToWatch directory. _#LifeHacking_ :-)
+**#LifeHacking :-)**
+
+Automatically handle downloading from KickAssTorrents the latest episodes of your list of favorite shows, get matching subs on Addic7ed and rename all files cleanly in your ToWatch directory.
 
 Optionnally always download first episodes of new shows.
 
