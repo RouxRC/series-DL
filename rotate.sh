@@ -8,14 +8,14 @@ mkdir -p "$ACHIEVED_DIR" "$READY_DIR"
 # Cleanup torrent files
 find "$ACHIEVED_DIR" -regex ".*/[0-9]+-[0-9]+\..*\.[A-F0-9]+\.torrent" -exec rm -f {} \;
 
+# Remove sample videos
+find "$ACHIEVED_DIR" -regex ".*[.-][sS][aA][mM][pP][lL][eE]\.\(mkv\|mp4\|avi\)" -exec rm -f {} \;
 
 # Move finished video files and cleanup remnant directories
-find "$ACHIEVED_DIR" -regex ".*[sS][0-9]+[eE][0-9]+.*\.\(mkv\|mp4\|avi\)" | sort | while read VIDEOFILE; do
+find "$ACHIEVED_DIR" -regex ".*\([sS][0-9]+[eE][0-9]+\| - [0-9][0-9]+\).*\.\(mkv\|mp4\|avi\)" | sort | while read VIDEOFILE; do
   mv "$VIDEOFILE" "$READY_DIR/"
   VIDEOPATH=$(echo "$VIDEOFILE" | sed -r 's|^(.*)/[^/]+$|\1|')
   if [ "$VIDEOPATH" != "$ACHIEVED_DIR" ]; then
-    # Remove sample videos
-    find "$VIDEOPATH" -regex ".*[.\-][sS][aA][mM][pP][lL][eE]\.\(mkv\|mp4\|avi\)" -exec rm -f {} \;
     # Remove extra files
     find "$VIDEOPATH" -regex ".*\.\(txt\|srt\|nfo\|png\|jpg\)" -exec rm -f {} \;
     rm -df "$VIDEOPATH" 2> /dev/null
