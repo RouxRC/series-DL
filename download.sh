@@ -68,7 +68,7 @@ echo "$SOURCES" | while read SOURCE; do
       TORRENT_ID=$(echo "$TORRENT_URL" | sed -r 's|^.*/([0-9A-F]+)\.torrent|\1|')
       TORRENT_NAME=$(echo "$line" | sed 's/^.*#//')
       TORRENT_EP=$(echo "$TORRENT_NAME"                   |
-       sed -r "s/ ${RES}p[ \].].*$//i"                    |
+       sed -r "s/ ${RES}p( |]|\.).*$//i"                  |
        sed -r 's/\(?[0-9]{4}\)? (S[0-9]+E[0-9]+)/\1/i'    |
        sed -r 's/(E[0-9]+) [a-z]+ [a-z]+.*$/\1/i'         |
        sed -r 's/( - [0-9]+) .*$/\1/')
