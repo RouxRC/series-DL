@@ -62,6 +62,7 @@ echo "$SOURCES" | while read SOURCE; do
      sed 's|?title=.*class="cellMainLink">|#|'      |
      sed 's|</a>.*$||'                              |
      sed 's|<\/\?[^>]*>||g'                         |
+     grep -v "Download torrent file"                |
      while read line; do
       TORRENT_URL=$(echo "$line" | sed 's/#.*$//')
       TORRENT_ID=$(echo "$TORRENT_URL" | sed -r 's|^.*/([0-9A-F]+)\.torrent|\1|')
