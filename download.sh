@@ -81,8 +81,13 @@ echo "$SOURCES" | while read SOURCE; do
         continue
       fi
       echo "$SHOWS" | while read SHOW; do
+        EPSEARCH=".*s[0-9]\+e[0-9]\+"
+        if echo "$SHOW" | grep "#NOSEASON" > /dev/null; then
+          SHOW=$(echo "$SHOW" | sed 's/\s*#NOSEASON\s*$//')
+          EPSEARCH="[0-9][0-9]\+"
+        fi
         MATCH=$(uniqname "$SHOW")
-        if echo "$SEARCHABLE" | grep "^$MATCH.*s[0-9]\+e[0-9]\+" > /dev/null; then
+        if echo "$SEARCHABLE" | grep "^${MATCH}${EPSEARCH}" > /dev/null; then
           start_torrent
           break
         fi
