@@ -74,7 +74,7 @@ echo "$SOURCES" | while read SOURCE; do
        sed -r 's/( - [0-9]+) .*$/\1/')
       SEARCHABLE=$(uniqname "$TORRENT_NAME")
       LOWERED=$(lowerize "$TORRENT_EP")
-      if grep "$LOWERED" episodes.done > /dev/null; then
+      if grep "^$LOWERED$" episodes.done > /dev/null; then
         continue
       elif $DL_ALL_FIRST_EPS && echo "$TORRENT_EP" | grep -i " S01E01" > /dev/null; then
         start_torrent
