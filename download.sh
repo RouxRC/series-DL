@@ -7,6 +7,20 @@ ROOT_URL="https://kat.cr/usearch/"
 mkdir -p .tmp
 touch episodes.done
 
+function safecurl {
+  url=$1
+  retries=$2
+  if [ -z "$retries" ]; then
+    retries=10
+  fi
+  curl -sL --connect-timeout 5 "$url" > /tmp/safecurl-dl-series.tmp
+  if test -s /tmp/safecurl-dl-series.tmp ; then
+    zcat /tmp/safecurl-dl-series.tmp
+  elif [ "$retries" -gt 0 ]; then
+    safecurl "$url" $(( $retries - 1 ))
+  fi
+}
+
 function lowerize {
   echo "$1" | sed -r 's/^(.*)$/\L\1/'
 }
@@ -55,7 +69,7 @@ echo "$SOURCES" | while read SOURCE; do
   for PAGE in $(seq $PAGES); do
     URL="${ROOT_URL}$QUERY/$PAGE/?field=time_add&sorder=desc"
     echo "QUERY $URL"
-    curl -sL "$URL" | zcat                          |
+    safecurl "$URL"                                 |
      grep 'class="cellMainLink"\|\.torrent?title'   |
      tr '\n' ' '                                    |
      sed 's|//torcache|\nhttp://torcache|g'         |
