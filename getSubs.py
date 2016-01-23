@@ -73,7 +73,7 @@ re_split_team = re.compile(r'\W+')
 rewrite_teams = lambda x: x.replace('DD5.1', 'DD51').replace('H.264', 'H264')
 str_list = lambda x: " ".join(x) if type(x) == list else x
 team_infos = lambda text: [team_eq(x) for x in re_split_team.split(rewrite_teams(str_list(text)).lower()) if x not in ["", "colored", "works", "with", "versions"]]
-re_extra_teams = re.compile(r'(preair|works? with .*)', re.I)
+re_extra_teams = re.compile(r'(preair|(?:compatible|works)? with .*)', re.I)
 
 re_filename = lambda lang: re.compile(r'^.*filename="(.*)\.%s\..*"$' % lang)
 re_clean_ep = re.compile(r' - 0?(\d+)x(\d+ - )')
