@@ -14,9 +14,7 @@ function safecurl {
     retries=10
   fi
   curl -sL --connect-timeout 5 "$url" > /tmp/safecurl-dl-series.tmp
-  if test -s /tmp/safecurl-dl-series.tmp ; then
-    zcat /tmp/safecurl-dl-series.tmp
-  elif [ "$retries" -gt 0 ]; then
+  if ! zcat /tmp/safecurl-dl-series.tmp 2> /dev/null && [ "$retries" -gt 0 ]; then
     safecurl "$url" $(( $retries - 1 ))
   fi
 }
