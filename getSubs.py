@@ -80,6 +80,8 @@ re_clean_ep = re.compile(r' - 0?(\d+)x(\d+ - )')
 clean_name = lambda name, lang: re_clean_ep.sub(r' - \1\2', (re_filename(lang).sub(r'\1', name)))
 
 re_year = re.compile(r'\((\d{4})\)')
+re_rmyear = re.compile(r'\d{4}$')
+rmyear = lambda x: re_rmyear.sub('', x)
 re_clean_metas = re.compile(r'\.?\[[^\]]*\]', re.I)
 re_clean_html = re.compile(r'\s*<[^>]+>\s*')
 re_versions = re.compile(r'Version (.*?), [\d.]+ MBs.*?</td>.*?class="newsDate"[^>]*> *(.*?) *</td>.*?(class="language".*?) </table>')
@@ -93,6 +95,10 @@ def dl_sub_and_rename(path, vid, shows, lang):
     for show in shows:
         if show["key"].startswith(cleaner(name)) and season <= show["seasons"] and episode <= show["episodes"]:
             matches.append(show)
+    if not len(matches):
+        for show in shows:
+            if show["key"].startswith(rmyear(cleaner(name))) and season <= show["seasons"] and episode <= show["episodes"]:
+                matches.append(show)
     if not len(matches):
         print >> sys.stderr, "WARNING: could not match %s with any show from addic7ed" % vid
         return
