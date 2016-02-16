@@ -86,7 +86,8 @@ echo "$SOURCES" | while read SOURCE; do
        sed -r 's/( - [0-9]+) .*$/\1/')
       SEARCHABLE=$(echo "$TORRENT_NAME" | sed 's/^\[[^]]*\] *//')
       SEARCHABLE=$(uniqname "$SEARCHABLE")
-      LOWERED=$(lowerize "$TORRENT_EP")
+      LOWERED=$(echo "$TORRENT_EP" | sed 's/^\[[^]]*\] *//')
+      LOWERED=$(lowerize "$LOWERED")
       if grep "^$LOWERED$" episodes.done > /dev/null; then
         continue
       elif $DL_ALL_FIRST_EPS && echo "$TORRENT_EP" | grep -i " S01E01" > /dev/null; then
