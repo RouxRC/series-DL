@@ -27,7 +27,7 @@ def err(typ, season, name, urlseason, episode=None):
 re_clean_lines = re.compile(r'[\s\t\n\r]+')
 re_line_shows = re.compile(r'<tr> *<td class="version">.*?</tr> *<tr><td class="newsDate">.*?</tr>', re.I)
 re_show = re.compile(r'<a href="/show/(\d+)">([^<]+)</a>', re.I)
-re_eps = re.compile(r'<td class="newsDate">(\d+) Seasons?, (-?\d+) Episodes? *</td>', re.I)
+re_eps = re.compile(r'<td class="newsDate">(\d+) (?:Season|Temporada)s?, (-?\d+) Epis\S+s? *</td>', re.I)
 def get_all_shows():
     html = try_get("shows.php")
     if not html:
@@ -43,8 +43,8 @@ def get_all_shows():
               "id": int(show[0]),
               "name": show[1],
               "key": cleaner(show[1]),
-              "seasons": int(new_eps[i][0]),
-              "episodes": int(new_eps[i][1]),
+              "seasons": int(new_eps[i][0]) if new_eps else 1,
+              "episodes": int(new_eps[i][1]) if new_eps else 1,
               "year": year.group(1) if year else 0
             })
     return shows
