@@ -49,7 +49,7 @@ def get_all_shows():
             })
     return shows
 
-re_vid = re.compile(r'^(.*)\.s(\d+)e(\d+)\.(.*)\.(mkv|mp4|avi)$', re.I)
+re_vid = re.compile(r'^(.*)\.s(\d+)e(\d+)\.(.*)\.(mkv|mp4|avi|flv)$', re.I)
 def ls_vids_dir(path):
     vids = []
     for vid in os.listdir(vids_dir):
