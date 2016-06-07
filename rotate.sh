@@ -18,7 +18,7 @@ find "$ACHIEVED_DIR" -regex ".*\([sS][0-9]+[eE][0-9]+\| - [0-9][0-9]+\).*\.\(mkv
   if [ "$VIDEOPATH" != "$ACHIEVED_DIR" ]; then
     # Remove extra files
     find "$VIDEOPATH" -regex ".*\.\(txt\|srt\|nfo\|png\|jpg\)" -exec rm -f {} \;
-    rm -df "$VIDEOPATH" 2> /dev/null
+    find "$VIDEOPATH" -depth -type d -empty -exec rm -df {} \;
   fi
 done
 
