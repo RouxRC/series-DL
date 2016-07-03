@@ -52,7 +52,7 @@ def get_all_shows():
 re_vid = re.compile(r'^(.*)\.s(\d+)e(\d+)\.(.*)\.(mkv|mp4|avi|flv)$', re.I)
 def ls_vids_dir(path):
     vids = []
-    for vid in sorted(os.listdir(vids_dir)):
+    for vid in sorted(os.listdir(vids_dir), key=lambda x: x.lower()):
         if not os.path.isfile(os.path.join(vids_dir, vid)):
             continue
         if not re_vid.match(vid):
