@@ -16,12 +16,13 @@ SUBS_LANG="English"
 DL_ALL_FIRST_EPS=true
 
 # One source per line, optionnally completed by the number of pages to crawl
-SOURCES="rartv 5
-ettv 5
+SOURCES="ettv 3
+rartv
+AnimeRG
 Lucifer22"
 
 # One show per line
-# add #NOSEASON at the end of the line for animes (without S0E05 pattern)
+# add #NOSEASON at the end of the line for animes (without SxxEyy pattern)
 SHOWS="Game of Thrones
 The league
 Dragon Ball Super #NOSEASON"

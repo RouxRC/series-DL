@@ -38,6 +38,16 @@ Edit `config.inc` and set your choices of:
 ./download.sh
 ```
 
+- To catch up episodes of a specific show:
+
+```bash
+./download.sh "Game of Thrones"
+# optionnally bypass the general resolution choice adding a second random argument
+./download.sh "Powers" 1
+# or for an anime or any show without SxxEyy pattern:
+./download.sh "Naruto Shippuuden #NOSEASON"
+```
+
 - To download new episodes subtitles and rename the video altogether:
 
 ```bash

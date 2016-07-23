@@ -7,6 +7,10 @@ ROOT_URL="https://thepiratebay.org/search/"
 mkdir -p .tmp
 touch episodes.done
 
+CATCHUP=$1
+NORES=$2
+SLEEPDELAY=30
+
 function safecurl {
   url=$1
   retries=$2
@@ -42,21 +46,15 @@ function start_magnet {
   start_client
   "$TORRENT_CLIENT" "$MAGNET_URL" >> logAzu.txt 2>&1 &
   echo "$LOWERED" >> episodes.done
+  sleep $SLEEPDELAY
 }
 
-echo
-echo $(date)
-echo "----------------------"
-echo "$SOURCES" | while read SOURCE; do
-  SOURCE=$(echo "$SOURCE" | sed 's/\s\+/ /g' | sed -r 's/(^ | $)//')
-  PAGES=1
-  if echo "$SOURCE" | grep " [0-9]\+\s*" > /dev/null; then
-    PAGES=$(echo "$SOURCE" | sed -r 's/^.* ([0-9]+) ?$/\1/')
+function search_episodes {
+  RESSTR="[0-9]+0"
+  if [ -z "$NORES" ]; then
+    RESSTR=$RES
   fi
-  QUERY=$(echo "$SOURCE"        |
-   sed -r "s| +[0-9]+?$||"      |
-   sed 's/ /%20/g')"%20${RES}p"
-  for PAGE in $(seq 0 $PAGES); do
+  for PAGE in $(seq 0 $(($PAGES - 1))); do
     URL="${ROOT_URL}$QUERY/$PAGE/3//"
     echo "QUERY $URL"
     safecurl "$URL"                             |
@@ -70,7 +68,7 @@ echo "$SOURCES" | while read SOURCE; do
       MAGNET_URL=$(echo "$line" | sed 's/^.*#//')
       TORRENT_NAME=$(echo "$line" | sed 's/#.*$//' | sed 's/\./ /g')
       TORRENT_EP=$(echo "$TORRENT_NAME"                   |
-       sed -r "s/ ${RES}p( |]|\.).*$//i"                  |
+       sed -r "s/ ${RESSTR}p( |]|\.).*$//i"               |
        sed -r 's/\(?[0-9]{4}\)? (S[0-9]+E[0-9]+)/\1/i'    |
        sed -r 's/(E[0-9]+) [a-z]+ [a-z]+.*$/\1/i'         |
        sed -r 's/( - [0-9]+) .*$/\1/')
@@ -98,4 +96,35 @@ echo "$SOURCES" | while read SOURCE; do
       done
     done
   done
-done
+}
+
+echo
+echo $(date)
+echo "----------------------"
+if [ -z "$CATCHUP" ]; then
+  echo "$SOURCES" | while read SOURCE; do
+    SOURCE=$(echo "$SOURCE" | sed 's/\s\+/ /g' | sed -r 's/(^ | $)//g')
+    PAGES=1
+    if echo "$SOURCE" | grep " [0-9]\+\s*" > /dev/null; then
+      PAGES=$(echo "$SOURCE" | sed -r 's/^.* ([0-9]+) ?$/\1/')
+    fi
+    QUERY=$(echo "$SOURCE"        |
+     sed -r 's| +[0-9]+?$||'      |
+     sed 's/ /%20/g')"%20${RES}p"
+    search_episodes
+  done
+else
+  RESSTR=
+  if [ -z "$NORES" ]; then
+    RESSTR="%20${RES}p"
+  fi
+  SHOWS=$CATCHUP
+  QUERY=$(echo "$CATCHUP"       |
+   sed 's/\s*#NOSEASON\s*$//'   |
+   sed 's/\s\+/ /g'             |
+   sed -r 's/(^ | $)//g'        |
+   sed 's/ /%20/g')"$RESSTR"
+  PAGES=10
+  SLEEPDELAY=90
+  search_episodes
+fi
