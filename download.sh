@@ -2,7 +2,7 @@
 
 cd $(dirname $0)
 source config.inc
-ROOT_URL="https://kat.cr/usearch/"
+ROOT_URL="https://thepiratebay.org/search/"
 
 mkdir -p .tmp
 touch episodes.done
@@ -14,7 +14,9 @@ function safecurl {
     retries=10
   fi
   curl -sL --connect-timeout 5 "$url" > /tmp/safecurl-dl-series.tmp
-  if ! zcat /tmp/safecurl-dl-series.tmp 2> /dev/null && [ "$retries" -gt 0 ]; then
+  if grep '<html' /tmp/safecurl-dl-series.tmp; then
+    cat /tmp/safecurl-dl-series.tmp
+  elif ! zcat /tmp/safecurl-dl-series.tmp 2> /dev/null && [ "$retries" -gt 0 ]; then
     safecurl "$url" $(( $retries - 1 ))
   fi
 }
@@ -35,21 +37,11 @@ function start_client {
   fi
 }
 
-function start_torrent {
-  echo "- Starting torrent $TORRENT_ID for: $TORRENT_NAME"
+function start_magnet {
+  echo "- Starting magnet for: $TORRENT_NAME"
   start_client
-  cd .tmp
-  TORRENT_FILE=$(date +%y%m%d-%H%M)".${TORRENT_NAME}.${TORRENT_ID}.torrent"
-  wget --quiet --header='Accept: text/html' --header='User-Agent: test' "$TORRENT_URL" -O "${TORRENT_FILE}.gz"
-  gunzip "${TORRENT_FILE}.gz"
-  if [ "$?" -ne 0 ] || ! test -e "$TORRENT_FILE"; then
-    echo " WARNING: torrent download failed at $TORRENT_URL"
-    rm -f "${TORRENT_FILE}.gz"
-  else
-    "$TORRENT_CLIENT" "$TORRENT_FILE" >> logAzu.txt 2>&1 &
-    echo "$LOWERED" >> ../episodes.done
-  fi
-  cd ..
+  "$TORRENT_CLIENT" "$MAGNET_URL" >> logAzu.txt 2>&1 &
+  echo "$LOWERED" >> episodes.done
 }
 
 echo
@@ -64,21 +56,19 @@ echo "$SOURCES" | while read SOURCE; do
   QUERY=$(echo "$SOURCE"        |
    sed -r "s| +[0-9]+?$||"      |
    sed 's/ /%20/g')"%20${RES}p"
-  for PAGE in $(seq $PAGES); do
-    URL="${ROOT_URL}$QUERY/$PAGE/?field=time_add&sorder=desc"
+  for PAGE in $(seq 0 $PAGES); do
+    URL="${ROOT_URL}$QUERY/$PAGE/3//"
     echo "QUERY $URL"
-    safecurl "$URL"                                 |
-     grep 'class="cellMainLink"\|\.torrent?title'   |
-     tr '\n' ' '                                    |
-     sed 's|//torcache|\nhttp://torcache|g'         |
-     sed 's|?title=.*class="cellMainLink">|#|'      |
-     sed 's|</a>.*$||'                              |
-     sed 's|<\/\?[^>]*>||g'                         |
-     grep -v "Download torrent file"                |
+    safecurl "$URL"                             |
+     grep 'href="\(magnet:\|/torrent/\)'        |
+     tr '\n' ' '                                |
+     sed 's|="/torrent/[^>]*>|\n|g'             |
+     sed 's|</a>.*<a href="magnet:|#magnet:|'   |
+     sed 's|" title.*$||'                       |
+     grep -v '"detName"'                        |
      while read line; do
-      TORRENT_URL=$(echo "$line" | sed 's/#.*$//')
-      TORRENT_ID=$(echo "$TORRENT_URL" | sed -r 's|^.*/([0-9A-F]+)\.torrent|\1|')
-      TORRENT_NAME=$(echo "$line" | sed 's/^.*#//')
+      MAGNET_URL=$(echo "$line" | sed 's/^.*#//')
+      TORRENT_NAME=$(echo "$line" | sed 's/#.*$//' | sed 's/\./ /g')
       TORRENT_EP=$(echo "$TORRENT_NAME"                   |
        sed -r "s/ ${RES}p( |]|\.).*$//i"                  |
        sed -r 's/\(?[0-9]{4}\)? (S[0-9]+E[0-9]+)/\1/i'    |
@@ -86,12 +76,12 @@ echo "$SOURCES" | while read SOURCE; do
        sed -r 's/( - [0-9]+) .*$/\1/')
       SEARCHABLE=$(echo "$TORRENT_NAME" | sed 's/^\[[^]]*\] *//')
       SEARCHABLE=$(uniqname "$SEARCHABLE")
-      LOWERED=$(echo "$TORRENT_EP" | sed 's/\s*\[[^]]*\]\s*//g')
+      LOWERED=$(echo "$TORRENT_EP" | sed 's/\s*\[[^]]*\(\]\s*\|$\)//g')
       LOWERED=$(lowerize "$LOWERED")
       if grep "^$LOWERED$" episodes.done > /dev/null; then
         continue
       elif $DL_ALL_FIRST_EPS && echo "$TORRENT_EP" | grep -i " S01E01" > /dev/null; then
-        start_torrent
+        start_magnet
         continue
       fi
       echo "$SHOWS" | while read SHOW; do
@@ -102,7 +92,7 @@ echo "$SOURCES" | while read SOURCE; do
         fi
         MATCH=$(uniqname "$SHOW")
         if echo "$SEARCHABLE" | grep "^${MATCH}${EPSEARCH}" > /dev/null; then
-          start_torrent
+          start_magnet
           break
         fi
       done
