@@ -6,7 +6,7 @@ Automatically handle downloading from KickAssTorrents the latest episodes of you
 
 Optionnally always download first episodes of new shows.
 
-Meant for use under Linux with Vuze/Azureus torrent client, but should also work under MacOsX and with any torrent client that handles starting torrent from command line.
+Meant for use under Linux with Vuze/Azureus torrent client, but should also work under MacOsX and with any torrent client that handles starting magnet links from command line.
 
 
 ## Dependencies
@@ -23,7 +23,7 @@ cp config.inc{.example,}
 ```
 
 Edit `config.inc` and set your choices of:
-- torrent client (written for [Vuze/Azureus](http://www.vuze.com/) but should work with any client able to start torrents from command line such as `azureus file.torrent`)
+- torrent client (written for [Vuze/Azureus](http://www.vuze.com/) but should work with any client able to start magnet links from command line such as `azureus "magnet:xxxxxx"`)
 - Achieved torrents and ReadyToWatch directories
 - resolution and subtitles language
 - whether you want to discover first episodes of new shows
