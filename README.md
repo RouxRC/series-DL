@@ -2,7 +2,7 @@
 
 **#LifeHacking :-)**
 
-Automatically handle downloading from ThePirateBay the latest episodes of your list of favorite shows, get matching subs on Addic7ed and rename all files cleanly in your ToWatch directory.
+Automatically handle downloading from EZTV and ThePirateBay the latest episodes of your list of favorite shows, get matching subs on Addic7ed and rename all files cleanly in your ToWatch directory.
 
 Optionnally always download first episodes of new shows.
 
