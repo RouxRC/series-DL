@@ -2,14 +2,12 @@
 
 cd $(dirname $0)
 source config.inc
-ROOT_URL="https://thepiratebay.org/search/"
 
 mkdir -p .tmp
 touch episodes.done
 
 CATCHUP=$1
 NORES=$2
-SLEEPDELAY=30
 
 function safecurl {
   url=$1
@@ -41,19 +39,84 @@ function start_client {
   fi
 }
 
+function start_torrent {
+  echo "- Starting torrent for: $TORRENT_NAME"
+  start_client
+  cd .tmp
+  TORRENT_FILE=$(date +%y%m%d-%H%M)".${TORRENT_NAME}.torrent"
+  wget --quiet "$TORRENT_URL" -O "$TORRENT_FILE"
+  if [ "$?" -ne 0 ] || ! test -s "$TORRENT_FILE"; then
+    echo " WARNING: torrent download failed at $TORRENT_URL"
+    rm -f "$TORRENT_FILE"
+  else
+    "$TORRENT_CLIENT" "$TORRENT_FILE" >> logAzu.txt 2>&1 &
+    echo "$LOWERED" >> ../episodes.done
+  fi
+  cd ..
+}
+
 function start_magnet {
   echo "- Starting magnet for: $TORRENT_NAME"
   start_client
-  "$TORRENT_CLIENT" "$MAGNET_URL" >> logAzu.txt 2>&1 &
+  "$TORRENT_CLIENT" "$TORRENT_URL" >> logAzu.txt 2>&1 &
   echo "$LOWERED" >> episodes.done
   sleep $SLEEPDELAY
 }
 
-function search_episodes {
-  RESSTR="[0-9]+0"
+function download_if_required {
+  #echo $TORRENT_NAME $TORRENT_URL
+  DLTYPE=$1
+  RESSRC="[0-9]+0"
   if [ -z "$NORES" ]; then
-    RESSTR=$RES
+    RESSRC=$RES
   fi
+  TORRENT_EP=$(echo "$TORRENT_NAME"                   |
+   sed -r "s/ ${RESSRC}p( |]|\.).*$//i"               |
+   sed -r 's/\(?[0-9]{4}\)? (S[0-9]+E[0-9]+)/\1/i'    |
+   sed -r 's/(E[0-9]+) [a-z]+ [a-z]+.*$/\1/i'         |
+   sed -r 's/( - [0-9]+) .*$/\1/')
+  SEARCHABLE=$(echo "$TORRENT_NAME" | sed 's/^\[[^]]*\] *//')
+  SEARCHABLE=$(uniqname "$SEARCHABLE")
+  LOWERED=$(echo "$TORRENT_EP" | sed 's/\s*\[[^]]*\(\]\s*\|$\)//g')
+  LOWERED=$(lowerize "$LOWERED")
+  if grep "^$LOWERED$" episodes.done > /dev/null; then
+    continue
+  elif $DL_ALL_FIRST_EPS && echo "$TORRENT_EP" | grep -i " S01E01" > /dev/null; then
+    start_"$DLTYPE"
+    continue
+  fi
+  echo "$SHOWS" | while read SHOW; do
+    EPSEARCH=".*s[0-9]\+e[0-9]\+"
+    if echo "$SHOW" | grep "#NOSEASON" > /dev/null; then
+      SHOW=$(echo "$SHOW" | sed 's/\s*#NOSEASON\s*$//')
+      EPSEARCH="[0-9][0-9]\+"
+    fi
+    MATCH=$(uniqname "$SHOW")
+    if echo "$SEARCHABLE" | grep "^${MATCH}${EPSEARCH}" > /dev/null; then
+      start_"$DLTYPE"
+      break
+    fi
+  done
+}
+
+function search_episodes_eztv {
+  ROOT_URL="https://eztv.ag/"
+  URL="${ROOT_URL}$QUERY"
+  echo "QUERY $URL"
+  safecurl "$URL"                       |
+   grep "$RESSTR"'.*class="download_1"'   |
+   sed 's|^.*<a href="||'               |
+   sed 's|".*title="|#|'                |
+   sed 's| Torrent: .*$||'              |
+   while read line; do
+    TORRENT_URL=$(echo "$line" | sed 's/#.*$//')
+    TORRENT_NAME=$(echo "$line" | sed 's/^.*#//')
+    download_if_required "torrent"
+  done
+}
+
+function search_episodes_piratebay {
+  ROOT_URL="https://thepiratebay.org/search/"
   for PAGE in $(seq 0 $(($PAGES - 1))); do
     URL="${ROOT_URL}$QUERY/$PAGE/3//"
     echo "QUERY $URL"
@@ -65,43 +128,26 @@ function search_episodes {
      sed 's|" title.*$||'                       |
      grep -v '"detName"'                        |
      while read line; do
-      MAGNET_URL=$(echo "$line" | sed 's/^.*#//')
+      TORRENT_URL=$(echo "$line" | sed 's/^.*#//')
       TORRENT_NAME=$(echo "$line" | sed 's/#.*$//' | sed 's/\./ /g')
-      TORRENT_EP=$(echo "$TORRENT_NAME"                   |
-       sed -r "s/ ${RESSTR}p( |]|\.).*$//i"               |
-       sed -r 's/\(?[0-9]{4}\)? (S[0-9]+E[0-9]+)/\1/i'    |
-       sed -r 's/(E[0-9]+) [a-z]+ [a-z]+.*$/\1/i'         |
-       sed -r 's/( - [0-9]+) .*$/\1/')
-      SEARCHABLE=$(echo "$TORRENT_NAME" | sed 's/^\[[^]]*\] *//')
-      SEARCHABLE=$(uniqname "$SEARCHABLE")
-      LOWERED=$(echo "$TORRENT_EP" | sed 's/\s*\[[^]]*\(\]\s*\|$\)//g')
-      LOWERED=$(lowerize "$LOWERED")
-      if grep "^$LOWERED$" episodes.done > /dev/null; then
-        continue
-      elif $DL_ALL_FIRST_EPS && echo "$TORRENT_EP" | grep -i " S01E01" > /dev/null; then
-        start_magnet
-        continue
-      fi
-      echo "$SHOWS" | while read SHOW; do
-        EPSEARCH=".*s[0-9]\+e[0-9]\+"
-        if echo "$SHOW" | grep "#NOSEASON" > /dev/null; then
-          SHOW=$(echo "$SHOW" | sed 's/\s*#NOSEASON\s*$//')
-          EPSEARCH="[0-9][0-9]\+"
-        fi
-        MATCH=$(uniqname "$SHOW")
-        if echo "$SEARCHABLE" | grep "^${MATCH}${EPSEARCH}" > /dev/null; then
-          start_magnet
-          break
-        fi
-      done
+      download_if_required "magnet"
     done
   done
 }
 
-echo
-echo $(date)
-echo "----------------------"
-if [ -z "$CATCHUP" ]; then
+function set_resstr {
+  P20=
+  if [ -z "$1" ]; then
+    P20=$1
+  fi
+  RESSTR=
+  if [ -z "$NORES" ]; then
+    RESSTR="$P20$RES"p
+  fi
+}
+
+function get_recent_piratebay {
+  SLEEPDELAY=100
   echo "$SOURCES" | while read SOURCE; do
     SOURCE=$(echo "$SOURCE" | sed 's/\s\+/ /g' | sed -r 's/(^ | $)//g')
     PAGES=1
@@ -111,20 +157,46 @@ if [ -z "$CATCHUP" ]; then
     QUERY=$(echo "$SOURCE"        |
      sed -r 's| +[0-9]+?$||'      |
      sed 's/ /%20/g')"%20${RES}p"
-    search_episodes
+    search_episodes_piratebay
   done
+}
+
+function get_recent_eztv {
+  PAGES=10
+  set_resstr
+  for PAGE in $(seq 0 $(($PAGES - 1))); do
+    QUERY="page_$PAGE"
+    search_episodes_eztv
+  done
+}
+
+function catchup_show_piratebay {
+  SLEEPDELAY=90
+  PAGES=10
+  set_resstr "%20"
+  QUERY="$QUERY$RESSTR"
+  search_episodes_piratebay
+}
+
+function catchup_show_eztv {
+  set_resstr
+  QUERY="search/$QUERY"
+  search_episodes_eztv
+}
+
+echo
+echo $(date)
+echo "----------------------"
+if [ -z "$CATCHUP" ]; then
+  get_recent_eztv
+  get_recent_piratebay
 else
-  RESSTR=
-  if [ -z "$NORES" ]; then
-    RESSTR="%20${RES}p"
-  fi
   SHOWS=$CATCHUP
   QUERY=$(echo "$CATCHUP"       |
    sed 's/\s*#NOSEASON\s*$//'   |
    sed 's/\s\+/ /g'             |
    sed -r 's/(^ | $)//g'        |
-   sed 's/ /%20/g')"$RESSTR"
-  PAGES=10
-  SLEEPDELAY=90
-  search_episodes
+   sed 's/ /%20/g')
+  catchup_show_eztv
+  catchup_show_piratebay
 fi
