@@ -104,7 +104,7 @@ function search_episodes_eztv {
   URL="${ROOT_URL}$QUERY"
   echo "QUERY $URL"
   safecurl "$URL"                       |
-   grep "$RESSTR"'.*class="download_1"'   |
+   grep "$RESSTR"'.*class="download_1"' |
    sed 's|^.*<a href="||'               |
    sed 's|".*title="|#|'                |
    sed 's| Torrent: .*$||'              |
@@ -116,7 +116,8 @@ function search_episodes_eztv {
 }
 
 function search_episodes_piratebay {
-  ROOT_URL="https://thepiratebay.org/search/"
+  #ROOT_URL="https://thepiratebay.org/search/"
+  ROOT_URL="https://piratenproxy.nl/thepiratebay.org/search/"
   for PAGE in $(seq 0 $(($PAGES - 1))); do
     URL="${ROOT_URL}$QUERY/$PAGE/3//"
     echo "QUERY $URL"
@@ -137,7 +138,7 @@ function search_episodes_piratebay {
 
 function set_resstr {
   P20=
-  if [ -z "$1" ]; then
+  if [ ! -z "$1" ]; then
     P20=$1
   fi
   RESSTR=
@@ -171,7 +172,7 @@ function get_recent_eztv {
 }
 
 function catchup_show_piratebay {
-  SLEEPDELAY=90
+  SLEEPDELAY=180
   PAGES=10
   set_resstr "%20"
   QUERY="$QUERY$RESSTR"
