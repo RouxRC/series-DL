@@ -85,7 +85,7 @@ rmyear = lambda x: re_rmyear.sub('', x)
 re_clean_metas = re.compile(r'\.?\[[^\]]*\]', re.I)
 re_clean_html = re.compile(r'\s*<[^>]+>\s*')
 re_versions = re.compile(r'Version (.*?), [\d.]+ MBs.*?</td>.*?class="newsDate"[^>]*> *(.*?) *</td>.*?(class="language".*?) </table>')
-re_subs = lambda lang: re.compile(r'class="language">%s<.*?<b>Completed.*?href="(/original/\d+/\d+)"(?:.*?</a><a class="buttonDownload" href="(/updated/\d+/\d+/\d+)")?' % lang)
+re_subs = lambda lang: re.compile(r'class="language">%s<.*?<b>Completed.*?href="(?:(/original/\d+/\d+)"(?:.*?</a><a class="buttonDownload" href="(/updated/\d+/\d+/\d+)")?|(/updated/\d+/\d+/\d+)")' % lang)
 def dl_sub_and_rename(path, vid, shows, lang):
     name, season, episode, metas, ext = re_vid.search(vid).groups()
     season = int(season)
@@ -128,7 +128,7 @@ def dl_sub_and_rename(path, vid, shows, lang):
                 subs.append({
                   "version": version,
                   "score": score,
-                  "url": sub[1] if sub[1] else sub[0]
+                  "url": sub[2] if sub[2] else sub[1] if sub[1] else sub[0]
                 })
             else:
                 others.add(".".join(version))
