@@ -176,14 +176,18 @@ function catchup_show_piratebay {
   SLEEPDELAY=180
   PAGES=10
   set_resstr "%20"
+  ROOTQUERY=$QUERY
   QUERY="$QUERY$RESSTR"
   search_episodes_piratebay
+  QUERY=$ROOTQUERY
 }
 
 function catchup_show_eztv {
   set_resstr
+  ROOTQUERY=$QUERY
   QUERY="search/$QUERY"
   search_episodes_eztv
+  QUERY=$ROOTQUERY
 }
 
 echo
