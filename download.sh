@@ -44,7 +44,8 @@ function start_torrent {
   start_client
   cd .tmp
   TORRENT_FILE=$(date +%y%m%d-%H%M)".${TORRENT_NAME}.torrent"
-  wget --quiet "$TORRENT_URL" -O "$TORRENT_FILE"
+  TORRENT_URL=$(echo $TORRENT_URL | sed 's/\[/%5B/g' | sed 's/\]/%5D/g')
+  $PROXY_SERVER curl -sL "$TORRENT_URL" > "$TORRENT_FILE"
   if [ "$?" -ne 0 ] || ! test -s "$TORRENT_FILE"; then
     echo " WARNING: torrent download failed at $TORRENT_URL"
     rm -f "$TORRENT_FILE"

@@ -2,6 +2,9 @@
 # should be able to start new torrents with commands such as `$TORRENT_CLIENT file.torrent`
 TORRENT_CLIENT="azureus"
 
+# Optional intermediary server to proxy torrents download
+#PROXY_SERVER="ssh myserver"
+
 # Where your TORRENT_CLIENT saves completed torrents
 ACHIEVED_DIR="achieved"
 # Where you want everything ready to be watched to be
