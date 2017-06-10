@@ -61,6 +61,7 @@ def ls_vids_dir(path):
     return vids
 
 team_eqs = {
+  "sva": "avs",
   "lol": "dimension",
   "sys": "dimension",
   "xii": "immerse",
