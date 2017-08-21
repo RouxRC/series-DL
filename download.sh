@@ -100,6 +100,21 @@ function download_if_required {
   done
 }
 
+function search_episodes_eztv_magnet {
+  ROOT_URL="https://eztv.ag/"
+  URL="${ROOT_URL}$QUERY"
+  echo "QUERY $URL"
+  safecurl "$URL"                           |
+   grep "$RESSTR"'.*class="magnet"'         |
+   sed 's|^.*<a href="||'                   |
+   sed 's|".*title="|#|'                    |
+   sed 's| \[eztv\] ([0-9.]\+ [MG]B) Magnet Link.*$||'  |
+   while read line; do
+    TORRENT_URL=$(echo "$line" | sed 's/#.*$//')
+    TORRENT_NAME=$(echo "$line" | sed 's/^.*#//')
+    download_if_required "magnet"
+  done
+}
 function search_episodes_eztv {
   ROOT_URL="https://eztv.ag/"
   URL="${ROOT_URL}$QUERY"
@@ -164,11 +179,12 @@ function get_recent_piratebay {
 }
 
 function get_recent_eztv {
+  SLEEPDELAY=100
   PAGES=10
   set_resstr
   for PAGE in $(seq 0 $(($PAGES - 1))); do
     QUERY="page_$PAGE"
-    search_episodes_eztv
+    search_episodes_eztv_magnet
   done
 }
 
@@ -183,10 +199,11 @@ function catchup_show_piratebay {
 }
 
 function catchup_show_eztv {
+  SLEEPDELAY=100
   set_resstr
   ROOTQUERY=$QUERY
   QUERY="search/$QUERY"
-  search_episodes_eztv
+  search_episodes_eztv_magnet
   QUERY=$ROOTQUERY
 }
 
