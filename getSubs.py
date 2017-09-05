@@ -42,7 +42,7 @@ def get_all_shows():
             shows.append({
               "id": int(show[0]),
               "name": show[1],
-              "key": cleaner(show[1]),
+              "key": cleaner(show[1].replace("&", "and")),
               "seasons": int(new_eps[i][0]) if new_eps else 1,
               "episodes": int(new_eps[i][1]) if new_eps else 1,
               "year": year.group(1) if year else 0
