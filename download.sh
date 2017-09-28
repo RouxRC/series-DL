@@ -2,7 +2,6 @@
 
 cd $(dirname $0)
 source config.inc
-cp -f move_completed.sh "$DOWNLOAD_DIR/"
 
 mkdir -p .tmp
 touch episodes.done
@@ -62,7 +61,7 @@ function start_magnet {
   echo "- Starting magnet for: $TORRENT_NAME"
   start_client
   cd $DOWNLOAD_DIR
-  "$TORRENT_CLIENT" "$TORRENT_URL" >> logAzu.txt 2>&1 &
+  $TORRENT_CLIENT "$TORRENT_URL" >> logAzu.txt 2>&1 &
   cd - > /dev/null
   echo "$LOWERED" >> episodes.done
   sleep $SLEEPDELAY
