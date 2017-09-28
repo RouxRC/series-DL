@@ -2,6 +2,7 @@
 
 cd $(dirname $0)
 source config.inc
+cp -f move_completed.sh "$DOWNLOAD_DIR/"
 
 mkdir -p .tmp
 touch episodes.done
