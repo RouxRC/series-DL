@@ -33,6 +33,7 @@ function uniqname {
 
 function start_client {
   CLIENT=$(echo "$TORRENT_CLIENT" | sed 's/ .*$//')
+  if [ "$CLIENT" = "aria2c" ]; then return; fi
   if ! ps x | grep "$CLIENT" | grep -v " grep " > /dev/null; then
     "$CLIENT" >> logTor.txt 2>&1 &
     sleep 3
@@ -59,7 +60,9 @@ function start_torrent {
 function start_magnet {
   echo "- Starting magnet for: $TORRENT_NAME"
   start_client
+  cd $DOWNLOAD_DIR
   "$TORRENT_CLIENT" "$TORRENT_URL" >> logAzu.txt 2>&1 &
+  cd - > /dev/null
   echo "$LOWERED" >> episodes.done
   sleep $SLEEPDELAY
 }
@@ -179,7 +182,7 @@ function get_recent_piratebay {
 }
 
 function get_recent_eztv {
-  SLEEPDELAY=100
+  SLEEPDELAY=300
   PAGES=10
   set_resstr
   for PAGE in $(seq 0 $(($PAGES - 1))); do
@@ -199,7 +202,7 @@ function catchup_show_piratebay {
 }
 
 function catchup_show_eztv {
-  SLEEPDELAY=100
+  SLEEPDELAY=180
   set_resstr
   ROOTQUERY=$QUERY
   QUERY="search/$QUERY"

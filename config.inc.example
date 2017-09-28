@@ -1,11 +1,12 @@
 # Command line for your torrent client
 # should be able to start new torrents with commands such as `$TORRENT_CLIENT file.torrent`
-TORRENT_CLIENT="azureus"
+TORRENT_CLIENT="aria2c --seed-time=3600 --log-level=info --show-console-readout=false --on-download-complete move_completed.sh"
 
 # Optional intermediary server to proxy torrents download
 #PROXY_SERVER="ssh myserver"
 
-# Where your TORRENT_CLIENT saves completed torrents
+# Where your TORRENT_CLIENT downloads and stores completed torrents
+DOWNLOAD_DIR=""
 ACHIEVED_DIR="achieved"
 # Where you want everything ready to be watched to be
 READY_DIR="ready"

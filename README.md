@@ -23,7 +23,7 @@ cp config.inc{.example,}
 ```
 
 Edit `config.inc` and set your choices of:
-- torrent client (written for [Vuze/Azureus](http://www.vuze.com/) but should work with any client able to start magnet links from command line such as `azureus "magnet:xxxxxx"`)
+- torrent client (written for Aria2c but should work with any client able to start magnet links from command line such as `aria2c "magnet:xxxxxx"`)
 - Achieved torrents and ReadyToWatch directories
 - resolution and subtitles language
 - whether you want to discover first episodes of new shows
