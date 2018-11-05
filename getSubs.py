@@ -57,8 +57,7 @@ def ls_vids_dir(path):
             continue
         if not re_vid.match(vid):
             continue
-        vids.append(vid)
-    return vids
+        yield vid
 
 team_eqs = {
   "sva": "avs",
