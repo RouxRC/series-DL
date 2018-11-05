@@ -164,7 +164,10 @@ def get_config():
         return None, None
 
 if __name__ == "__main__":
-    subs_lang, vids_dir = get_config()
+    if len(sys.argv) > 1:
+        subs_lang = sys.argv[1]
+        vids_dir = sys.argv[2]
+    else: subs_lang, vids_dir = get_config()
     if not subs_lang:
         exit(1)
     if not os.path.isdir(vids_dir):
