@@ -114,6 +114,7 @@ function search_episodes_eztv_magnet {
    sed 's|^.*<a href="||'                   |
    sed 's|".*title="|#|'                    |
    sed 's| \[eztv\] ([0-9.]\+ [MG]B) Magnet Link.*$||'  |
+   grep -v "x265-MiNX"                      |
    while read line; do
     TORRENT_URL=$(echo "$line" | sed 's/#.*$//')
     TORRENT_NAME=$(echo "$line" | sed 's/^.*#//')
