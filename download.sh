@@ -42,6 +42,7 @@ function start_client {
 
 function start_torrent {
   echo "- Starting torrent for: $TORRENT_NAME"
+  echo "  -> $TORRENT_URL"
   start_client
   cd .tmp
   TORRENT_FILE=$(date +%y%m%d-%H%M)".${TORRENT_NAME}.torrent"
@@ -59,6 +60,7 @@ function start_torrent {
 
 function start_magnet {
   echo "- Starting magnet for: $TORRENT_NAME"
+  echo "  -> $TORRENT_URL"
   start_client
   cd $DOWNLOAD_DIR
   $TORRENT_CLIENT "$TORRENT_URL" >> logAzu.txt 2>&1 &
@@ -182,7 +184,7 @@ function get_recent_piratebay {
 }
 
 function get_recent_eztv {
-  SLEEPDELAY=300
+  SLEEPDELAY=100
   PAGES=10
   set_resstr
   for PAGE in $(seq 0 $(($PAGES - 1))); do
