@@ -77,7 +77,7 @@ re_extra_teams = re.compile(r'(preair|(?:compatible|works)? with .*)', re.I)
 
 re_filename = lambda lang: re.compile(r'^.*filename="(.*)\.%s\..*"$' % lang)
 re_clean_ep = re.compile(r' - 0?(\d+)x(\d+ - )')
-clean_name = lambda name, lang: re_clean_ep.sub(r' - \1\2', (re_filename(lang).sub(r'\1', name)))
+clean_name = lambda name, lang: re_clean_ep.sub(r' - \1\2', (re_filename(lang).sub(r'\1', name))).replace('/', '-')
 
 re_year = re.compile(r'\((\d{4})\)')
 re_rmyear = re.compile(r'\d{4}$')
