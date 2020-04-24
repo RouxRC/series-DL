@@ -106,7 +106,7 @@ function download_if_required {
 }
 
 function search_episodes_eztv_magnet {
-  ROOT_URL="https://eztv.ag/"
+  ROOT_URL="https://eztv.io/"
   URL="${ROOT_URL}$QUERY"
   echo "QUERY $URL"
   safecurl "$URL"                           |
@@ -122,7 +122,7 @@ function search_episodes_eztv_magnet {
   done
 }
 function search_episodes_eztv {
-  ROOT_URL="https://eztv.ag/"
+  ROOT_URL="https://eztv.io/"
   URL="${ROOT_URL}$QUERY"
   echo "QUERY $URL"
   safecurl "$URL"                       |
@@ -139,7 +139,7 @@ function search_episodes_eztv {
 
 function search_episodes_piratebay {
   #ROOT_URL="https://thepiratebay.org/search/"
-  ROOT_URL="https://piratenproxy.nl/thepiratebay.org/search/"
+  ROOT_URL="https://tpb.proxyduck.co/?load=/search/"
   for PAGE in $(seq 0 $(($PAGES - 1))); do
     URL="${ROOT_URL}$QUERY/$PAGE/3//"
     echo "QUERY $URL"
