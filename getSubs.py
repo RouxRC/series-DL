@@ -4,13 +4,14 @@
 import os, sys, re
 import requests
 
-ROOT_URL = "http://www.addic7ed.com/"
+ROOT_URL = "https://www.addic7ed.com/"
+COOKIE = {}
 
 re_cleaner = re.compile(r'[^a-z\d]')
 cleaner = lambda x: re_cleaner.sub('', x.lower())
 
-def try_get(page, ref="", headers=False, retries=3):
-    r = requests.get("%s%s" % (ROOT_URL, page), headers={'Referer': "%s%s" % (ROOT_URL, ref)})
+def try_get(page, cookies=COOKIE, ref="", headers=False, retries=3):
+    r = requests.get("%s%s" % (ROOT_URL, page), headers={'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0', 'Referer': "%s%s" % (ROOT_URL, ref)}, cookies=cookies)
     if r.status_code != 200:
         if retries:
             return try_get(page, ref=ref, headers=headers, retries=retries-1)
@@ -169,12 +170,14 @@ if __name__ == "__main__":
         vids_dir = sys.argv[2]
     else: subs_lang, vids_dir = get_config()
     if not subs_lang:
+        print >> sys.stderr, "ERROR: %no subs lang in config"
         exit(1)
     if not os.path.isdir(vids_dir):
         print >> sys.stderr, "ERROR: %s is not a directory" % vids_dir
         exit(1)
     shows = get_all_shows()
     if not shows:
+        print "ERROR collecting list of shows on http://www.addic7ed.com/shows.php"
         exit(1)
     for vid in ls_vids_dir(vids_dir):
         dl_sub_and_rename(vids_dir, vid, shows, subs_lang)
