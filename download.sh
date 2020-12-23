@@ -106,7 +106,7 @@ function download_if_required {
 }
 
 function search_episodes_eztv_magnet {
-  ROOT_URL="https://eztv.io/"
+  ROOT_URL="https://eztv.re/"
   URL="${ROOT_URL}$QUERY"
   echo "QUERY $URL"
   safecurl "$URL"                           |
@@ -122,7 +122,7 @@ function search_episodes_eztv_magnet {
   done
 }
 function search_episodes_eztv {
-  ROOT_URL="https://eztv.io/"
+  ROOT_URL="https://eztv.re/"
   URL="${ROOT_URL}$QUERY"
   echo "QUERY $URL"
   safecurl "$URL"                       |
@@ -186,9 +186,9 @@ function get_recent_piratebay {
 
 function get_recent_eztv {
   SLEEPDELAY=100
-  PAGES=10
+  PAGES=25
   set_resstr
-  for PAGE in $(seq 0 $(($PAGES - 1))); do
+  for PAGE in $(seq 0 $PAGES); do
     QUERY="page_$PAGE"
     search_episodes_eztv_magnet
   done
