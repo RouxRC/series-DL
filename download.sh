@@ -86,10 +86,10 @@ function download_if_required {
   LOWERED=$(echo "$TORRENT_EP" | sed 's/\s*\[[^]]*\(\]\s*\|$\)//g')
   LOWERED=$(lowerize "$LOWERED")
   if grep "^$LOWERED$" episodes.done > /dev/null; then
-    continue
+    return
   elif $DL_ALL_FIRST_EPS && echo "$TORRENT_EP" | grep -i " S01E01" > /dev/null; then
     start_"$DLTYPE"
-    continue
+    return
   fi
   echo "$SHOWS" | while read SHOW; do
     EPSEARCH=".*s[0-9]\+e[0-9]\+"
