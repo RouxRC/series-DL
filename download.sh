@@ -15,7 +15,7 @@ function safecurl {
   if [ -z "$retries" ]; then
     retries=10
   fi
-  curl -sL --connect-timeout 5 "$url" > /tmp/safecurl-dl-series.tmp
+  $PROXY_SERVER curl -sL --connect-timeout 5 "$url" > /tmp/safecurl-dl-series.tmp
   if grep '<html' /tmp/safecurl-dl-series.tmp; then
     cat /tmp/safecurl-dl-series.tmp
   elif ! zcat /tmp/safecurl-dl-series.tmp 2> /dev/null && [ "$retries" -gt 0 ]; then

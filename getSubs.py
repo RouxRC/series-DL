@@ -5,13 +5,16 @@ import os, sys, re
 import requests
 
 ROOT_URL = "https://www.addic7ed.com/"
-COOKIE = {}
+COOKIE = {
+}
+PROXY = {
+}
 
 re_cleaner = re.compile(r'[^a-z\d]')
 cleaner = lambda x: re_cleaner.sub('', x.lower())
 
 def try_get(page, cookies=COOKIE, ref="", headers=False, retries=3):
-    r = requests.get("%s%s" % (ROOT_URL, page), headers={'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0', 'Referer': "%s%s" % (ROOT_URL, ref)}, cookies=cookies)
+    r = requests.get("%s%s" % (ROOT_URL, page), headers={'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0', 'Referer': "%s%s" % (ROOT_URL, ref)}, cookies=cookies, proxies=PROXY or None)
     if r.status_code != 200:
         if retries:
             return try_get(page, ref=ref, headers=headers, retries=retries-1)
