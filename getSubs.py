@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os, sys, re
+from time import sleep
 import requests
 
 ROOT_URL = "https://www.addic7ed.com/"
@@ -17,6 +18,7 @@ def try_get(page, cookies=COOKIE, ref="", headers=False, retries=3):
     r = requests.get("%s%s" % (ROOT_URL, page), headers={'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0', 'Referer': "%s%s" % (ROOT_URL, ref)}, cookies=cookies, proxies=PROXY or None)
     if r.status_code != 200:
         if retries:
+            sleep(2)
             return try_get(page, ref=ref, headers=headers, retries=retries-1)
         return None if not headers else (None, None)
     if headers:
@@ -112,6 +114,7 @@ def dl_sub_and_rename(path, vid, shows, lang):
     if not listeps:
         err("page", season, name, urlseason)
         return
+    #sleep(0.1)
     re_find_url_ep = re.compile(r'"/(serie/[^/"]*/%s/%s/[^"]*)"' % (season, episode))
     urlep = re_find_url_ep.search(listeps)
     if not urlep:
@@ -122,6 +125,7 @@ def dl_sub_and_rename(path, vid, shows, lang):
     if not listsubs:
         err("page", season, name, urlep, episode)
         return
+    #sleep(0.1)
     subs = []
     others = set()
     for version in re_versions.findall(listsubs):
@@ -148,6 +152,7 @@ def dl_sub_and_rename(path, vid, shows, lang):
     with open(os.path.join(path, "%s.srt" % name), "w") as f:
         f.write(subtext)
     os.rename(os.path.join(path, vid), os.path.join(path, "%s.%s" % (name, ext)))
+    #sleep(0.1)
 
 re_lang = re.compile(r'SUBS_LANG="?(\w+)"?[\s\r\n]+')
 re_ready = re.compile(r'READY_DIR="?(.*?)"?[\s\r\n]+')
