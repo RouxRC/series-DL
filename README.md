@@ -20,14 +20,17 @@ pip install requests
 
 ```bash
 cp config.inc{.example,}
+cp config.py{.example,}
 ```
 
-Edit `config.inc` and set your choices of:
+Edit `config.inc` & `config.py` and set your choices of:
 - torrent client (written for Aria2c but should work with any client able to start magnet links from command line such as `aria2c "magnet:xxxxxx"`)
 - Achieved torrents and ReadyToWatch directories
 - resolution and subtitles language
 - whether you want to discover first episodes of new shows
 - list of shows
+- eventually some proxy servers (ssh home for torrent downloads in `config.sh`, http one for subs in `config.py`)
+- eventually some addic7ed logged in cookies
 
 
 ## Run
@@ -52,6 +55,12 @@ Edit `config.inc` and set your choices of:
 
 ```bash
 ./getSubs.py
+```
+
+- Or to download only subtitles for episodes with filename matching some filter:
+
+```bash
+./getSubs.py --filter "That special show"
 ```
 
 - To cleanup achieved torrents and move resulting video into your ready directory:

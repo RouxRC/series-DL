@@ -1,6 +1,8 @@
 .tmp
+*.pyc
 achieved
 ready
 episodes.done
 config.inc
+options.py
 log*.txt

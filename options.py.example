@@ -1,0 +1,14 @@
+COOKIE = {
+#    "utma": "xxxxxxxxx.xxxxxxxxxx.xxxxxxxxxx.xxxxxxxxxx.xxxxxxxxxx.xx",
+#    "utmb": "xxxxxxxxx.x.xx.xxxxxxxxxx",
+#    "utmc": "xxxxxxxxx",
+#    "utmt": "x",
+#    "utmz": "xxxxxxxxx.xxxxxxxxxx.x.x.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)",
+#    "PHPSESSID": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+#    "wikisubtitlesuser": "xxxxx",
+#    "wikisubtitlespass": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+PROXY = {
+#    "http": "http://proxy.example.com:3128",
+#    "https": "http://proxy.example.com:3128"
+}

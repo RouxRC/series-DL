@@ -6,10 +6,14 @@ from time import sleep
 import requests
 
 ROOT_URL = "https://www.addic7ed.com/"
-COOKIE = {
-}
-PROXY = {
-}
+try:
+    from options import COOKIE
+except:
+    COOKIE = {}
+try:
+    from options import PROXY
+except:
+    PROXY = {}
 
 re_cleaner = re.compile(r'[^a-z\d]')
 cleaner = lambda x: re_cleaner.sub('', x.lower())
