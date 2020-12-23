@@ -165,6 +165,12 @@ def get_config():
         return None, None
 
 if __name__ == "__main__":
+    filtr = None
+    if "--filter" in sys.argv:
+        for i,a in enumerate(list(sys.argv)):
+            if a == "--filter":
+                sys.argv.pop(i)
+                filtr = sys.argv.pop(i).lower()
     if len(sys.argv) > 1:
         subs_lang = sys.argv[1]
         vids_dir = sys.argv[2]
@@ -180,4 +186,5 @@ if __name__ == "__main__":
         print "ERROR collecting list of shows on http://www.addic7ed.com/shows.php"
         exit(1)
     for vid in ls_vids_dir(vids_dir):
-        dl_sub_and_rename(vids_dir, vid, shows, subs_lang)
+        if not filtr or filtr in vid.lower():
+            dl_sub_and_rename(vids_dir, vid, shows, subs_lang)
