@@ -16,7 +16,7 @@ function safecurl {
     retries=10
   fi
   $PROXY_SERVER curl -sL --connect-timeout 5 "$url" > /tmp/safecurl-dl-series.tmp
-  if grep '<html' /tmp/safecurl-dl-series.tmp; then
+  if grep '<html\|^{"' /tmp/safecurl-dl-series.tmp; then
     cat /tmp/safecurl-dl-series.tmp
   elif ! zcat /tmp/safecurl-dl-series.tmp 2> /dev/null && [ "$retries" -gt 0 ]; then
     safecurl "$url" $(( $retries - 1 ))
@@ -106,7 +106,7 @@ function download_if_required {
 }
 
 function search_episodes_eztv_magnet {
-  ROOT_URL="https://eztv.re/"
+  ROOT_URL="https://eztvx.to/"
   URL="${ROOT_URL}$QUERY"
   echo "QUERY $URL"
   safecurl "$URL"                           |
@@ -121,8 +121,27 @@ function search_episodes_eztv_magnet {
     download_if_required "magnet"
   done
 }
+
+function search_episodes_eztv_magnet_api {
+  ROOT_URL="https://eztvx.to/"
+  URL="${ROOT_URL}$QUERY"
+  echo "QUERY $URL"
+  safecurl "$URL"                           |
+   sed "s/},{/}\n{/g"                       |
+   grep '"magnet_url":.*'"$RESSTR"          |
+   sed 's/^.*":"magnet:/magnet:/'           |
+   sed 's/","title":"/#/'                   |
+   sed 's/",".*$//'                         |
+   sed 's/\\//g'                            |
+   while read line; do
+    TORRENT_URL=$(echo "$line" | sed 's/#.*$//')
+    TORRENT_NAME=$(echo "$line" | sed 's/^.*#//')
+    download_if_required "magnet"
+  done
+}
+
 function search_episodes_eztv {
-  ROOT_URL="https://eztv.re/"
+  ROOT_URL="https://eztvx.to/"
   URL="${ROOT_URL}$QUERY"
   echo "QUERY $URL"
   safecurl "$URL"                       |
@@ -186,11 +205,21 @@ function get_recent_piratebay {
 
 function get_recent_eztv {
   SLEEPDELAY=100
-  PAGES=25
+  PAGES=10
   set_resstr
   for PAGE in $(seq 0 $PAGES); do
     QUERY="page_$PAGE"
     search_episodes_eztv_magnet
+  done
+}
+
+function get_recent_eztv_api {
+  SLEEPDELAY=100
+  PAGES=10
+  set_resstr
+  for PAGE in $(seq 1 $PAGES); do
+    QUERY="api/get-torrents?limit=100&page=$PAGE"
+    search_episodes_eztv_magnet_api
   done
 }
 
@@ -217,8 +246,8 @@ echo
 echo $(date)
 echo "----------------------"
 if [ -z "$CATCHUP" ]; then
-  get_recent_eztv
-  get_recent_piratebay
+  get_recent_eztv_api
+  #get_recent_piratebay
 else
   SHOWS=$CATCHUP
   QUERY=$(echo "$CATCHUP"       |
